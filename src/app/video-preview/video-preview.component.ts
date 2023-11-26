@@ -86,13 +86,15 @@ export class VideoPreviewComponent
     this.cdr.markForCheck();
     this.playTrack(this.trackIndex);
     this.player.on('ended', () => {
-      this.trackIndex++;
-      if (this.trackIndex < this.trackSources.length) {
+      if (
+        this.player.currentTime() ===
+        this.trackSources[this.trackIndex].duration
+      ) {
+        this.trackIndex++;
         this.playTrack(this.trackIndex);
       }
       if (this.trackIndex === this.trackSources.length) {
         this.state = 'pause';
-        this.trackIndex--;
         this.cdr.markForCheck();
       }
     });
