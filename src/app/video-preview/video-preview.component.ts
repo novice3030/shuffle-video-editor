@@ -73,8 +73,8 @@ export class VideoPreviewComponent
         this.player.src(this.trackSources[this.trackIndex].source);
         this.player.load();
         if (this.state === 'play') {
-          this.player.currentTime(this.position);
           this.player.play();
+          this.player.currentTime(this.position);
         } else {
           this.player.currentTime(this.position);
         }

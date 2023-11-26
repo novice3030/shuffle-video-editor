@@ -102,17 +102,16 @@ export class VideoTrackComponent implements OnChanges {
         const timelineScrollLeft = timelineContainer.scrollLeft;
         const newPosition = (event.x + timelineScrollLeft - 10) / this.scale;
         this.position = newPosition;
-  
+
         let trackIndex = 0;
         let relativePosition = 0;
         let cumulativeDuration = 0;
         for (let i = 0; i < this.sources.length; i++) {
           const trackStart = i === 0 ? 0 : cumulativeDuration;
           const trackEnd = trackStart + this.sources[i].duration * this.scale;
-  
+
           if (event.x >= trackStart && event.x <= trackEnd) {
             trackIndex = i;
-            // Calculate the relative position within the current track
             relativePosition = (event.x - trackStart) / this.scale;
             this.positionChanged.emit({
               position: relativePosition,
@@ -120,7 +119,7 @@ export class VideoTrackComponent implements OnChanges {
             });
             break;
           }
-  
+
           cumulativeDuration += this.sources[i].duration * this.scale;
         }
       }
