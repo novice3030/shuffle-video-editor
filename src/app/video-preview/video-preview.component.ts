@@ -73,10 +73,8 @@ export class VideoPreviewComponent
         this.player.src(this.trackSources[this.trackIndex].source);
         this.player.load();
         if (this.state === 'play') {
+          this.player.currentTime(this.position);
           this.player.play();
-          this.player.currentTime(this.position);
-        } else {
-          this.player.currentTime(this.position);
         }
       } else {
         this.player.currentTime(this.position);
@@ -87,13 +85,16 @@ export class VideoPreviewComponent
   onPlayClicked() {
     this.state = 'play';
     this.cdr.markForCheck();
+    this.player.currentTime(this.position);
     this.playTrack(this.trackIndex);
     this.player.on('ended', () => {
       this.trackIndex++;
       if (this.trackIndex < this.trackSources.length) {
         this.playTrack(this.trackIndex);
+        this.trackIndex = this.trackSources.length;
       } else if (this.trackIndex === this.trackSources.length) {
         this.state = 'pause';
+        this.player.reset();
         this.cdr.markForCheck();
       }
     });
@@ -102,8 +103,8 @@ export class VideoPreviewComponent
       if (this.trackIndex === 0) {
         this.positionChanged.emit(currentTime);
       } else if (this.trackIndex > 0) {
-        const position = this.calcPosition(this.trackIndex, currentTime);
-        this.positionChanged.emit(position);
+        this.position = this.calcPosition(this.trackIndex, currentTime);
+        this.positionChanged.emit(this.position);
       }
     });
   }
@@ -128,6 +129,7 @@ export class VideoPreviewComponent
     ) {
       this.player.src(this.trackSources[index].source);
       this.player.load();
+      this.player.currentTime(this.position);
     }
     this.player.play();
   }
