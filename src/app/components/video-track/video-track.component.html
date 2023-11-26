@@ -1,0 +1,40 @@
+<video class="video-js" id="video-player"></video>
+<div class="row">
+  <mat-slider min="1" max="50" step="0.5">
+    <input
+      matSliderThumb
+      (valueChange)="onScaleChanged($event)"
+      [(ngModel)]="scale"
+    />
+  </mat-slider>
+</div>
+<div
+  class="track-container"
+  id="video-track"
+  #videoTrack="cdkDropList"
+  cdkDropList
+  (cdkDropListDropped)="drop($event)"
+  cdkDropListOrientation="horizontal"
+>
+  <div class="timeline" #timeLine (click)="onTimelineClicked($event)">
+    @for (marker of markers; track marker) {
+    <div class="marker">
+      {{ marker.text }}
+    </div>
+    }
+  </div>
+  <div class="cursor" [style.left]="position * this.scale + 'px'" #cursor></div>
+  <div class="source-list">
+    @for (source of sources; track source) {
+    <div
+      cdkDrag
+      [cdkDragData]="source"
+      class="source-item"
+      [style.width]="source.width * scale + 'px'"
+      [style.backgroundColor]="source.color"
+    >
+      {{ source.name }}
+    </div>
+    }
+  </div>
+</div>

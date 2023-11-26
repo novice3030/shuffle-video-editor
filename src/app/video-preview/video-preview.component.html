@@ -1,0 +1,13 @@
+<h3>Now playing {{ source?.name }}</h3>
+<video class="video-js" preload="none" id="video-preview" #videoPreview></video>
+<div class="row end-sm">
+  @if(state === 'pause') {
+  <button mat-icon-button color="primary" (click)="onPlayClicked()">
+    <mat-icon>play_circle</mat-icon>
+  </button>
+  } @else {
+  <button mat-icon-button color="primary" (click)="onPauseClicked()">
+    <mat-icon>pause_circle</mat-icon>
+  </button>
+  }
+</div>

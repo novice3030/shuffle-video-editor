@@ -1,0 +1,24 @@
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+        "left right right"
+        "footer footer footer";
+    height: calc(100vh - 64px); /* Full viewport height */
+}
+
+.left {
+    grid-area: left;
+    padding: 20px;
+}
+
+.right {
+    grid-area: right;
+    padding: 20px;
+}
+
+.footer {
+    grid-area: footer;
+    padding: 10px;
+}

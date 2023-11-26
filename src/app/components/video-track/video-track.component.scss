@@ -1,0 +1,62 @@
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.track-container {
+  overflow-x: auto;
+  width: 100%;
+  border: solid 1px black;
+  min-height: 4em;
+}
+
+.timeline {
+  display: inline-flex;
+  flex-direction: row;
+  height: 20px;
+  cursor: pointer;
+}
+
+.track-markers {
+  background-color: black;
+}
+
+.marker {
+  font-size: smaller;
+  position: relative;
+  width: 50px;
+  text-align: start;
+}
+
+.video-js {
+  display: none;
+  position: absolute;
+  left: -9999;
+  top: -9999;
+  visibility: hidden;
+}
+
+.source-list {
+  display: inline-flex;
+}
+
+.cursor {
+    box-sizing: border-box;
+    position: relative;
+    z-index: 9999;
+    height: 25px;
+    margin-top: -25px;
+    opacity: 0.5;
+    width: 5px;
+    left: 10px;
+    background-color: black;
+    cursor: pointer;
+}
+
+.source-item {
+  height: 60px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: solid 1px black;
+}
