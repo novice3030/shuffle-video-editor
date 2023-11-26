@@ -36,12 +36,14 @@ export class VideoTrackComponent implements OnChanges {
   @ViewChild('timeLine') timeLine!: ElementRef<HTMLElement>;
   @ViewChild('cursor') cursor!: ElementRef<HTMLElement>;
   @Output() trackItemsChanged = new EventEmitter<VideoSource[]>();
+  @Output() trackIndexChanged = new EventEmitter<number>();
   @Input() position = 0;
   @Input() scale = 1;
-  @Output() positionChanged = new EventEmitter<UserPositionEvent>();
+  @Output() positionChanged = new EventEmitter<number>();
   constructor(private cdr: ChangeDetectorRef) {}
   sources: VideoSource[] = [];
   markers: Marker[] = [];
+  private prevTrackIndex = -1;
 
   ngOnChanges() {
     if (this.cursor) {
@@ -113,10 +115,11 @@ export class VideoTrackComponent implements OnChanges {
           if (event.x >= trackStart && event.x <= trackEnd) {
             trackIndex = i;
             relativePosition = (event.x - trackStart) / this.scale;
-            this.positionChanged.emit({
-              position: relativePosition,
-              trackIndex,
-            });
+            this.positionChanged.emit(relativePosition);
+            if (this.prevTrackIndex !== trackIndex) {
+              this.prevTrackIndex = trackIndex;
+              this.trackIndexChanged.emit(trackIndex);
+            }
             break;
           }
 

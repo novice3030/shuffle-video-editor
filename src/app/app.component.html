@@ -22,6 +22,7 @@
     <video-track
       (positionChanged)="onUserPositionChanged($event)"
       [position]="currentPosition"
+      (trackIndexChanged)="onTrackIndexChanged($event)"
       (trackItemsChanged)="onTrackItemsChanged($event)"
     ></video-track>
   </div>

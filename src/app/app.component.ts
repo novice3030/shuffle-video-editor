@@ -86,8 +86,11 @@ export class AppComponent {
     this.currentPosition = event;
   }
 
-  onUserPositionChanged(event: UserPositionEvent) {
-    this.userPosition = event.position;
-    this.trackIndex = event.trackIndex;
+  onUserPositionChanged(event: number) {
+    this.userPosition = event;
+  }
+
+  onTrackIndexChanged(event: number) {
+    this.trackIndex = event;
   }
 }
