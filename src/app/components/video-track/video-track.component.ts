@@ -7,6 +7,7 @@ import {
   Input,
   OnChanges,
   Output,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -45,7 +46,7 @@ export class VideoTrackComponent implements OnChanges {
   markers: Marker[] = [];
   private prevTrackIndex = -1;
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
     if (this.cursor) {
       this.cursor.nativeElement.scrollIntoView({
         block: 'center',
@@ -106,16 +107,21 @@ export class VideoTrackComponent implements OnChanges {
         this.position = newPosition;
 
         let trackIndex = 0;
-        let relativePosition = 0;
         let cumulativeDuration = 0;
+        let prevDuration = 0;
         for (let i = 0; i < this.sources.length; i++) {
           const trackStart = i === 0 ? 0 : cumulativeDuration;
           const trackEnd = trackStart + this.sources[i].duration * this.scale;
-
-          if (event.x >= trackStart && event.x <= trackEnd) {
+          if (i > 0) {
+            prevDuration += this.sources[i - 1].duration;
+          }
+          if (
+            event.x + timelineScrollLeft >= trackStart &&
+            event.x + timelineScrollLeft <= trackEnd
+          ) {
             trackIndex = i;
-            relativePosition = (event.x - trackStart) / this.scale;
-            this.positionChanged.emit(relativePosition);
+            this.position - prevDuration;
+            this.positionChanged.emit(this.position - prevDuration);
             if (this.prevTrackIndex !== trackIndex) {
               this.prevTrackIndex = trackIndex;
               this.trackIndexChanged.emit(trackIndex);

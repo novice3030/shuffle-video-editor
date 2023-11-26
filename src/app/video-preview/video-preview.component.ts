@@ -89,19 +89,22 @@ export class VideoPreviewComponent
       this.trackIndex++;
       if (this.trackIndex < this.trackSources.length) {
         this.playTrack(this.trackIndex);
-      } else if (this.trackIndex === this.trackSources.length) {
+      }
+      if (this.trackIndex === this.trackSources.length) {
         this.state = 'pause';
-        this.player.reset();
+        this.trackIndex--;
         this.cdr.markForCheck();
       }
     });
     this.player.on('timeupdate', () => {
       const currentTime = this.player.currentTime() || 0;
-      if (this.trackIndex === 0) {
-        this.positionChanged.emit(currentTime);
-      } else if (this.trackIndex > 0) {
-        this.position = this.calcPosition(this.trackIndex, currentTime);
-        this.positionChanged.emit(this.position);
+      if (this.state === 'play') {
+        if (this.trackIndex === 0) {
+          this.positionChanged.emit(currentTime);
+        } else if (this.trackIndex > 0) {
+          this.position = this.calcPosition(this.trackIndex, currentTime);
+          this.positionChanged.emit(this.position);
+        }
       }
     });
   }
