@@ -21,11 +21,6 @@
     ></video-preview>
   </div>
   <div footer>
-    track index: {{ trackIndex() }}
-    <br />
-    track position: {{ trackPosition() }}
-    <br />
-    video position: {{ videoPosition() }}
     <video-track
       (positionChanged)="onUserPositionChanged($event)"
       [position]="trackPosition()"
