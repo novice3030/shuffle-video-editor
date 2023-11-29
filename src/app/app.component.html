@@ -14,14 +14,21 @@
       [pause]="sourceToPlay?.isPlaying || false"
       [source]="sourceToPlay"
       (positionChanged)="onPreviewPositionChanged($event)"
-      [position]="userPosition"
-      [trackIndex]="trackIndex"
+      [position]="videoPosition()"
+      [userPosition]="userPosition"
+      [trackIndex]="trackIndex()"
+      (trackIndexChanged)="onPlayNextTrack()"
     ></video-preview>
   </div>
   <div footer>
+    track index: {{ trackIndex() }}
+    <br />
+    track position: {{ trackPosition() }}
+    <br />
+    video position: {{ videoPosition() }}
     <video-track
       (positionChanged)="onUserPositionChanged($event)"
-      [position]="currentPosition"
+      [position]="trackPosition()"
       (trackIndexChanged)="onTrackIndexChanged($event)"
       (trackItemsChanged)="onTrackItemsChanged($event)"
     ></video-track>

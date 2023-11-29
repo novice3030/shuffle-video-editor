@@ -23,6 +23,7 @@ import { Marker } from '../../interfaces/marker';
 import { MatSliderModule } from '@angular/material/slider';
 import { FormsModule } from '@angular/forms';
 import { UserPositionEvent } from '../../interfaces/user-position-event';
+import { StateService } from '../../services/state.service';
 const colors = ['red', 'green', 'blue', 'yellow', 'brown', 'gold', 'orange'];
 const markerWidth = 50;
 @Component({
@@ -41,10 +42,9 @@ export class VideoTrackComponent implements OnChanges {
   @Input() position = 0;
   @Input() scale = 1;
   @Output() positionChanged = new EventEmitter<number>();
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private state: StateService) {}
   sources: VideoSource[] = [];
   markers: Marker[] = [];
-  private prevTrackIndex = -1;
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.cursor) {
@@ -100,12 +100,13 @@ export class VideoTrackComponent implements OnChanges {
 
   onTimelineClicked(event: MouseEvent) {
     if (this.sources.length > 0) {
+      let tempPosition = this.position;
       const timelineContainer = this.timeLine.nativeElement.parentElement;
       if (timelineContainer) {
         const timelineScrollLeft = timelineContainer.scrollLeft;
         const newPosition = (event.x + timelineScrollLeft - 10) / this.scale;
         this.position = newPosition;
-
+        tempPosition = newPosition;
         let trackIndex = 0;
         let cumulativeDuration = 0;
         let prevDuration = 0;
@@ -120,12 +121,13 @@ export class VideoTrackComponent implements OnChanges {
             event.x + timelineScrollLeft <= trackEnd
           ) {
             trackIndex = i;
-            this.position - prevDuration;
-            this.positionChanged.emit(this.position - prevDuration);
-            if (this.prevTrackIndex !== trackIndex) {
-              this.prevTrackIndex = trackIndex;
-              this.trackIndexChanged.emit(trackIndex);
-            }
+            tempPosition -= prevDuration;
+            this.trackIndexChanged.emit(trackIndex);
+            this.positionChanged.emit(this.position);
+            this.state.userPositionChanged$.next({
+              position: tempPosition,
+              trackIndex,
+            });
             break;
           }
 

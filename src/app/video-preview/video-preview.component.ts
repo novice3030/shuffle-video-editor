@@ -19,6 +19,7 @@ import { VideoSource } from '../interfaces/video-source';
 import Player from 'video.js/dist/types/player';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { StateService } from '../services/state.service';
 
 @Component({
   selector: 'video-preview',
@@ -31,7 +32,10 @@ import { MatIconModule } from '@angular/material/icon';
 export class VideoPreviewComponent
   implements AfterViewInit, OnChanges, OnDestroy
 {
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private stateService: StateService
+  ) {}
 
   @ViewChild('videoPreview', { static: true }) videoPreview!: ElementRef;
   @Input() source?: VideoSource;
@@ -39,8 +43,11 @@ export class VideoPreviewComponent
   @Input() pause = false;
   @Output() positionChanged = new EventEmitter<number>();
   @Input() position = 0;
+  @Input() userPosition = 0;
   @Input() trackIndex = 0;
+  @Output() trackIndexChanged = new EventEmitter<number>();
   private player!: Player;
+  private prevUserPosition = 0;
   state: 'play' | 'pause' = 'pause';
 
   ngAfterViewInit(): void {
@@ -49,6 +56,31 @@ export class VideoPreviewComponent
       fluid: true,
       aspectRatio: '8:3',
     });
+    this.stateService.userPositionChanged$.subscribe((change) => {
+      this.prevUserPosition = change.position;
+      this.player.currentTime(change.position);
+    });
+    this.player.on('ended', () => {
+      this.prevUserPosition = 0;
+      if (this.trackIndex < this.trackSources.length - 1) {
+        this.trackIndexChanged.emit();
+      } else {
+        this.state = 'pause';
+        this.cdr.markForCheck();
+      }
+    });
+    this.player.on('loadedmetadata', () => {
+      this.player.currentTime(this.prevUserPosition);
+    });
+    this.player.on('timeupdate', () => {
+      const currentTime = this.player.currentTime() || 0;
+      if (this.state === 'play') {
+        this.positionChanged.emit(currentTime);
+      }
+    });
+    this.player.on('play', () => {
+      this.player.currentTime(this.position);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -56,7 +88,9 @@ export class VideoPreviewComponent
       if (this.player.currentSrc() !== this.source.source) {
         this.player.src(this.source.source);
         this.player.load();
-        this.player.play();
+        if (this.state === 'play') {
+          this.player.play();
+        }
       } else {
         if (!this.source.isPlaying) {
           this.player.pause();
@@ -65,15 +99,13 @@ export class VideoPreviewComponent
         }
       }
     }
-    if (this.player && this.position) {
-      this.player.currentTime(this.position);
+    if (this.player) {
       if (
         changes['trackIndex']?.currentValue !==
         changes['trackIndex']?.previousValue
       ) {
         this.player.src(this.trackSources[this.trackIndex].source);
         this.player.load();
-        this.player.currentTime(this.position);
         if (this.state === 'play') {
           this.player.play();
         }
@@ -85,36 +117,20 @@ export class VideoPreviewComponent
     this.state = 'play';
     this.cdr.markForCheck();
     this.playTrack(this.trackIndex);
-    this.player.on('ended', () => {
-      if (
-        this.player.currentTime() ===
-        this.trackSources[this.trackIndex].duration
-      ) {
-        this.trackIndex++;
-        this.playTrack(this.trackIndex);
-      }
-      if (this.trackIndex === this.trackSources.length) {
-        this.state = 'pause';
-        this.cdr.markForCheck();
-      }
-    });
-    this.player.on('timeupdate', () => {
-      const currentTime = this.player.currentTime() || 0;
-      if (this.state === 'play') {
-        if (this.trackIndex === 0) {
-          this.positionChanged.emit(currentTime);
-        } else if (this.trackIndex > 0) {
-          this.position = this.calcPosition(this.trackIndex, currentTime);
-          this.positionChanged.emit(this.position);
-        }
-      }
-    });
   }
 
   onPauseClicked() {
     this.state = 'pause';
     this.player.pause();
     this.cdr.markForCheck();
+  }
+
+  private calcVideoPosition(currentTrackIndex: number, trackPosition: number) {
+    let prevTime = 0;
+    for (let i = 1; i <= currentTrackIndex; i++) {
+      prevTime = this.trackSources[i - 1].duration;
+    }
+    return trackPosition - prevTime;
   }
 
   private calcPosition(currentTrackIndex: number, currentTime: number): number {
