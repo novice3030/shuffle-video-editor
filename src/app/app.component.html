@@ -15,9 +15,8 @@
       [source]="sourceToPlay"
       (positionChanged)="onPreviewPositionChanged($event)"
       [position]="videoPosition()"
-      [userPosition]="userPosition"
       [trackIndex]="trackIndex()"
-      (trackIndexChanged)="onPlayNextTrack()"
+      (nextTrackIndex)="onPlayNextTrack()"
     ></video-preview>
   </div>
   <div footer>

@@ -43,9 +43,8 @@ export class VideoPreviewComponent
   @Input() pause = false;
   @Output() positionChanged = new EventEmitter<number>();
   @Input() position = 0;
-  @Input() userPosition = 0;
   @Input() trackIndex = 0;
-  @Output() trackIndexChanged = new EventEmitter<number>();
+  @Output() nextTrackIndex = new EventEmitter<number>();
   private player!: Player;
   private prevUserPosition = 0;
   state: 'play' | 'pause' = 'pause';
@@ -63,7 +62,7 @@ export class VideoPreviewComponent
     this.player.on('ended', () => {
       this.prevUserPosition = 0;
       if (this.trackIndex < this.trackSources.length - 1) {
-        this.trackIndexChanged.emit();
+        this.nextTrackIndex.emit();
       } else {
         this.state = 'pause';
         this.cdr.markForCheck();
@@ -123,22 +122,6 @@ export class VideoPreviewComponent
     this.state = 'pause';
     this.player.pause();
     this.cdr.markForCheck();
-  }
-
-  private calcVideoPosition(currentTrackIndex: number, trackPosition: number) {
-    let prevTime = 0;
-    for (let i = 1; i <= currentTrackIndex; i++) {
-      prevTime = this.trackSources[i - 1].duration;
-    }
-    return trackPosition - prevTime;
-  }
-
-  private calcPosition(currentTrackIndex: number, currentTime: number): number {
-    let totalDuration = 0;
-    for (let i = 0; i < currentTrackIndex; i++) {
-      totalDuration += this.trackSources[i]?.duration || 0;
-    }
-    return totalDuration + currentTime;
   }
 
   private playTrack(index: number) {
