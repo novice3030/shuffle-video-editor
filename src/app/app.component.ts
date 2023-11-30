@@ -106,7 +106,7 @@ export class AppComponent {
   }
 
   onPlayNextTrack() {
-    this.trackIndex.update((v) => (v <= this.trackSources.length ? v + 1 : v));
+    this.trackIndex.update((v) => v + 1);
   }
 
   onPlayClicked() {

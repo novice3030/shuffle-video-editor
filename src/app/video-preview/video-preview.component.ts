@@ -70,8 +70,8 @@ export class VideoPreviewComponent
       if (this.trackIndex < this.trackSources.length - 1) {
         this.nextTrackIndex.emit();
       } else {
+        this.player.pause();
         this.playerStateChanged.emit('pause');
-        this.cdr.markForCheck();
       }
     });
     this.player.on('loadedmetadata', () => {
