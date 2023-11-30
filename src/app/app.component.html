@@ -10,21 +10,26 @@
   <div right>
     <h2>Preview:</h2>
     <video-preview
-      [trackSources]="trackSources"
+      [trackSources]="trackSources()"
       [pause]="sourceToPlay?.isPlaying || false"
       [source]="sourceToPlay"
       (positionChanged)="onPreviewPositionChanged($event)"
       [position]="videoPosition()"
       [trackIndex]="trackIndex()"
       (nextTrackIndex)="onPlayNextTrack()"
+      [playerState]="playerState()"
+      (playClicked)="onPlayClicked()"
+      (puaseClicked)="onPauseClicked()"
     ></video-preview>
   </div>
   <div footer>
     <video-track
+      [sources]="trackSources()"
       (positionChanged)="onUserPositionChanged($event)"
       [position]="trackPosition()"
       (trackIndexChanged)="onTrackIndexChanged($event)"
       (trackItemsChanged)="onTrackItemsChanged($event)"
+      (deleteTrackClicked)="onDeleteTrackClicked($event)"
     ></video-track>
   </div>
 </main-layout>

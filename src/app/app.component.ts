@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   ElementRef,
   ViewChild,
@@ -13,6 +14,7 @@ import { SourceListComponent } from './source-list/source-list.component';
 import { VideoPreviewComponent } from './video-preview/video-preview.component';
 import { VideoSource } from './interfaces/video-source';
 import { VideoTrackComponent } from './components/video-track/video-track.component';
+import { playerState } from './interfaces/player-state';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -28,16 +30,17 @@ import { VideoTrackComponent } from './components/video-track/video-track.compon
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
   @ViewChild('videoPreview', { static: true }) videoPreview!: ElementRef;
-  currentPosition = 0;
   userPosition = 0;
   trackPosition = signal(0);
   videoPosition = signal(0);
   trackIndex = signal(0);
+  playerState = signal<playerState>('stop');
   sourceToPlay?: VideoSource;
-  trackSources: VideoSource[] = [];
+  trackSources = signal<VideoSource[]>([]);
   videoSources: VideoSource[] = [
     {
       name: 'video 1',
@@ -78,7 +81,7 @@ export class AppComponent {
   }
 
   onTrackItemsChanged(event: VideoSource[]) {
-    this.trackSources = event;
+    this.trackSources.set([...event]);
   }
 
   onPreviewPositionChanged(event: number) {
@@ -106,13 +109,25 @@ export class AppComponent {
     this.trackIndex.update((v) => (v <= this.trackSources.length ? v + 1 : v));
   }
 
+  onPlayClicked() {
+    this.playerState.set('play');
+  }
+
+  onPauseClicked() {
+    this.playerState.set('pause');
+  }
+
+  onDeleteTrackClicked(trackIndex: number) {
+    this.trackSources().splice(trackIndex, 1);
+  }
+
   private calcTrackPosition(
     currentTrackIndex: number,
     currentTime: number
   ): number {
     let totalDuration = 0;
     for (let i = 0; i < currentTrackIndex; i++) {
-      totalDuration += this.trackSources[i]?.duration || 0;
+      totalDuration += this.trackSources()[i]?.duration || 0;
     }
     return totalDuration + currentTime;
   }
@@ -120,7 +135,7 @@ export class AppComponent {
   private calcVideoPosition(currentTrackIndex: number, trackPosition: number) {
     let prevTime = 0;
     for (let i = 1; i <= currentTrackIndex; i++) {
-      prevTime += this.trackSources[i - 1].duration;
+      prevTime += this.trackSources()[i - 1].duration;
     }
     return trackPosition - prevTime;
   }

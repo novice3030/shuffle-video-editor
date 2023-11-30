@@ -20,11 +20,13 @@ import Player from 'video.js/dist/types/player';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { StateService } from '../services/state.service';
+import { playerState } from '../interfaces/player-state';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'video-preview',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
   templateUrl: './video-preview.component.html',
   styleUrl: './video-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,9 +47,13 @@ export class VideoPreviewComponent
   @Input() position = 0;
   @Input() trackIndex = 0;
   @Output() nextTrackIndex = new EventEmitter<number>();
+  @Output() playClicked = new EventEmitter();
+  @Output() stopClicked = new EventEmitter();
+  @Output() puaseClicked = new EventEmitter();
+  @Output() playerStateChanged = new EventEmitter<playerState>();
+  @Input() playerState: playerState = 'stop';
   private player!: Player;
   private prevUserPosition = 0;
-  state: 'play' | 'pause' = 'pause';
 
   ngAfterViewInit(): void {
     this.player = videojs(this.videoPreview.nativeElement, {
@@ -64,7 +70,7 @@ export class VideoPreviewComponent
       if (this.trackIndex < this.trackSources.length - 1) {
         this.nextTrackIndex.emit();
       } else {
-        this.state = 'pause';
+        this.playerStateChanged.emit('pause');
         this.cdr.markForCheck();
       }
     });
@@ -73,7 +79,7 @@ export class VideoPreviewComponent
     });
     this.player.on('timeupdate', () => {
       const currentTime = this.player.currentTime() || 0;
-      if (this.state === 'play') {
+      if (this.playerState === 'play') {
         this.positionChanged.emit(currentTime);
       }
     });
@@ -87,7 +93,7 @@ export class VideoPreviewComponent
       if (this.player.currentSrc() !== this.source.source) {
         this.player.src(this.source.source);
         this.player.load();
-        if (this.state === 'play') {
+        if (this.playerState === 'play') {
           this.player.play();
         }
       } else {
@@ -105,7 +111,7 @@ export class VideoPreviewComponent
       ) {
         this.player.src(this.trackSources[this.trackIndex].source);
         this.player.load();
-        if (this.state === 'play') {
+        if (this.playerState === 'play') {
           this.player.play();
         }
       }
@@ -113,13 +119,12 @@ export class VideoPreviewComponent
   }
 
   onPlayClicked() {
-    this.state = 'play';
-    this.cdr.markForCheck();
+    this.playClicked.emit();
     this.playTrack(this.trackIndex);
   }
 
   onPauseClicked() {
-    this.state = 'pause';
+    this.puaseClicked.emit();
     this.player.pause();
     this.cdr.markForCheck();
   }

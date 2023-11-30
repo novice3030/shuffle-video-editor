@@ -21,15 +21,25 @@ import { VideoSource } from '../../interfaces/video-source';
 import videojs from 'video.js';
 import { Marker } from '../../interfaces/marker';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
-import { UserPositionEvent } from '../../interfaces/user-position-event';
 import { StateService } from '../../services/state.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 const colors = ['red', 'green', 'blue', 'yellow', 'brown', 'gold', 'orange'];
 const markerWidth = 50;
 @Component({
   selector: 'video-track',
   standalone: true,
-  imports: [CommonModule, DragDropModule, MatSliderModule, FormsModule],
+  imports: [
+    CommonModule,
+    DragDropModule,
+    MatSliderModule,
+    FormsModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   templateUrl: './video-track.component.html',
   styleUrl: './video-track.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,10 +50,11 @@ export class VideoTrackComponent implements OnChanges {
   @Output() trackItemsChanged = new EventEmitter<VideoSource[]>();
   @Output() trackIndexChanged = new EventEmitter<number>();
   @Input() position = 0;
-  @Input() scale = 1;
+  @Input() scale = 10;
+  @Input() sources: VideoSource[] = [];
   @Output() positionChanged = new EventEmitter<number>();
-  constructor(private cdr: ChangeDetectorRef, private state: StateService) {}
-  sources: VideoSource[] = [];
+  @Output() deleteTrackClicked = new EventEmitter<number>();
+  constructor(private state: StateService) {}
   markers: Marker[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
@@ -59,7 +70,6 @@ export class VideoTrackComponent implements OnChanges {
   drop(event: CdkDragDrop<VideoSource[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(this.sources, event.previousIndex, event.currentIndex);
-      this.cdr.markForCheck();
       this.trackItemsChanged.emit(this.sources);
     } else {
       const sourceToAdd = event.item.data as VideoSource;
@@ -137,6 +147,11 @@ export class VideoTrackComponent implements OnChanges {
     }
   }
 
+  onDeleteTrackClicked(trackIndex: number) {
+    this.deleteTrackClicked.emit(trackIndex);
+    this.initMarkers();
+  }
+
   private initMarkers() {
     this.markers = [];
     const totalDuration = this.getTotalDuration();
@@ -153,7 +168,6 @@ export class VideoTrackComponent implements OnChanges {
         width: 0,
       });
     }
-    this.cdr.markForCheck();
   }
 
   private getTotalDuration(): number {

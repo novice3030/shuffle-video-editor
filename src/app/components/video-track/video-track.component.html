@@ -1,6 +1,13 @@
 <video class="video-js" id="video-player"></video>
-<div class="row">
-  <mat-slider min="1" max="50" step="0.5">
+<div class="row middle-sm no-margin">
+  <div>Scale &nbsp;</div>
+  <mat-slider
+    matTooltip="Slide to adjust the timeline scale"
+    [disabled]="sources.length === 0"
+    min="10"
+    max="50"
+    step="0.5"
+  >
     <input
       matSliderThumb
       (valueChange)="onScaleChanged($event)"
@@ -23,17 +30,28 @@
     </div>
     }
   </div>
+  @if(sources.length > 0) {
   <div class="cursor" [style.left]="position * this.scale + 'px'" #cursor></div>
+  } @else {
+  <p style="margin-left: 1em">Drag some sources to get started</p>
+  }
   <div class="source-list">
-    @for (source of sources; track source) {
+    @for (source of sources; track source; let i = $index) {
     <div
       cdkDrag
       [cdkDragData]="source"
-      class="source-item"
+      class="source-item row space-between-sm no-margin"
       [style.width]="source.width * scale + 'px'"
       [style.backgroundColor]="source.color"
     >
-      {{ source.name }}
+      <div class="col-sm-4">
+        {{ source.name }}
+      </div>
+      <div class="delete-button col-sm-8 text-end">
+        <button mat-icon-button (click)="onDeleteTrackClicked(i)">
+          <mat-icon> delete </mat-icon>
+        </button>
+      </div>
     </div>
     }
   </div>
