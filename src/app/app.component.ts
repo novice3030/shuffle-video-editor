@@ -118,7 +118,9 @@ export class AppComponent {
   }
 
   onDeleteTrackClicked(trackIndex: number) {
-    this.trackSources().splice(trackIndex, 1);
+    this.trackSources.set(
+      this.trackSources().filter((source, index) => index !== trackIndex)
+    );
   }
 
   private calcTrackPosition(
