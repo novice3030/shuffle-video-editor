@@ -4,7 +4,6 @@ import {
   ElementRef,
   ViewChild,
   ViewEncapsulation,
-  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -14,7 +13,8 @@ import { SourceListComponent } from './source-list/source-list.component';
 import { VideoPreviewComponent } from './video-preview/video-preview.component';
 import { VideoSource } from './interfaces/video-source';
 import { VideoTrackComponent } from './components/video-track/video-track.component';
-import { playerState } from './interfaces/player-state';
+import { StateService } from './services/state.service';
+import { TrackSettingsComponent } from './components/track-settings/track-settings.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -26,6 +26,7 @@ import { playerState } from './interfaces/player-state';
     SourceListComponent,
     VideoPreviewComponent,
     VideoTrackComponent,
+    TrackSettingsComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -33,14 +34,16 @@ import { playerState } from './interfaces/player-state';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
+  constructor(private state: StateService) {}
   @ViewChild('videoPreview', { static: true }) videoPreview!: ElementRef;
   userPosition = 0;
-  trackPosition = signal(0);
-  videoPosition = signal(0);
-  trackIndex = signal(0);
-  playerState = signal<playerState>('stop');
+  trackPosition = this.state.trackPosition;
+  videoPosition = this.state.videoPosition;
+  trackIndex = this.state.trackIndex;
+  playerState = this.state.playerState;
+  selectedTrack = this.state.selectedTrack;
   sourceToPlay?: VideoSource;
-  trackSources = signal<VideoSource[]>([]);
+  trackSources = this.state.trackSources;
   videoSources: VideoSource[] = [
     {
       name: 'video 1',
@@ -120,6 +123,21 @@ export class AppComponent {
   onDeleteTrackClicked(trackIndex: number) {
     this.trackSources.set(
       this.trackSources().filter((source, index) => index !== trackIndex)
+    );
+  }
+
+  onTrackItemClicked(event: VideoSource) {
+    this.selectedTrack.set(event);
+  }
+
+  onTrackSettingsChanged(event: VideoSource) {
+    const trackIndex = this.trackSources().findIndex(
+      (track) => track === event
+    );
+    this.trackSources.set(
+      this.trackSources().map((source, index) =>
+        index === trackIndex ? event : source
+      )
     );
   }
 

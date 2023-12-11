@@ -33,14 +33,16 @@
   @if(sources.length > 0) {
   <div class="cursor" [style.left]="position * this.scale + 'px'" #cursor></div>
   } @else {
-  <p style="margin-left: 1em">Drag some sources to get started</p>
+  <h3 style="margin-left: 1em">Drag some sources to this container to get started</h3>
   }
   <div class="source-list">
     @for (source of sources; track source; let i = $index) {
     <div
+      (click)="onTrackItemClicked(source)"
       cdkDrag
       [cdkDragData]="source"
       class="source-item row space-between-sm no-margin"
+      [ngClass]="{ selected: source === selectedTrack }"
       [style.width]="source.width * scale + 'px'"
       [style.backgroundColor]="source.color"
     >

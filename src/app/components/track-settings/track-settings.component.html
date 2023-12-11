@@ -1,0 +1,20 @@
+<h3>Duration: {{ track.duration | number }}s</h3>
+<form [formGroup]="form">
+  <div class="row">
+    <mat-form-field appearance="outline">
+      <input matInput placeholder="track name" formControlName="name" />
+      <mat-label>track name</mat-label>
+    </mat-form-field>
+  </div>
+  <div class="row">
+    <mat-form-field appearance="outline">
+      <input
+        matInput
+        type="color"
+        placeholder="track color"
+        formControlName="color"
+      />
+      <mat-label>track color</mat-label>
+    </mat-form-field>
+  </div>
+</form>

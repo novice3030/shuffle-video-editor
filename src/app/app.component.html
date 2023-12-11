@@ -6,6 +6,9 @@
       (play)="onListPreviewPlay($event)"
       (pause)="onListPausePreviewClicked($event)"
     ></source-list>
+    @if(selectedTrack()) {
+    <track-settings [track]="selectedTrack()!" (trackChanged)="onTrackSettingsChanged($event)"></track-settings>
+    }
   </div>
   <div right>
     <h2>Preview:</h2>
@@ -25,11 +28,13 @@
   <div footer>
     <video-track
       [sources]="trackSources()"
+      [selectedTrack]="selectedTrack()"
       (positionChanged)="onUserPositionChanged($event)"
       [position]="trackPosition()"
       (trackIndexChanged)="onTrackIndexChanged($event)"
       (trackItemsChanged)="onTrackItemsChanged($event)"
       (deleteTrackClicked)="onDeleteTrackClicked($event)"
+      (trackItemClicked)="onTrackItemClicked($event)"
     ></video-track>
   </div>
 </main-layout>

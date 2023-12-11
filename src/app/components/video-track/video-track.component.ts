@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -26,7 +25,20 @@ import { FormsModule } from '@angular/forms';
 import { StateService } from '../../services/state.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-const colors = ['red', 'green', 'blue', 'yellow', 'brown', 'gold', 'orange'];
+const colors = [
+  '#3498db',
+  '#2ecc71',
+  '#e74c3c',
+  '#f39c12',
+  '#16a085',
+  '#c0392b',
+  '#1abc9c',
+  '#f1c40f',
+  '#2980b9',
+  '#27ae60',
+  '#d35400',
+  '#8e44ad',
+];
 const markerWidth = 50;
 @Component({
   selector: 'video-track',
@@ -49,9 +61,11 @@ export class VideoTrackComponent implements OnChanges {
   @ViewChild('cursor') cursor!: ElementRef<HTMLElement>;
   @Output() trackItemsChanged = new EventEmitter<VideoSource[]>();
   @Output() trackIndexChanged = new EventEmitter<number>();
+  @Output() trackItemClicked = new EventEmitter<VideoSource>();
   @Input() position = 0;
   @Input() scale = 10;
   @Input() sources: VideoSource[] = [];
+  @Input() selectedTrack: VideoSource | undefined;
   @Output() positionChanged = new EventEmitter<number>();
   @Output() deleteTrackClicked = new EventEmitter<number>();
   constructor(private state: StateService) {}
@@ -150,6 +164,10 @@ export class VideoTrackComponent implements OnChanges {
   onDeleteTrackClicked(trackIndex: number) {
     this.deleteTrackClicked.emit(trackIndex);
     this.initMarkers();
+  }
+
+  onTrackItemClicked(event: VideoSource) {
+    this.trackItemClicked.emit(event);
   }
 
   private initMarkers() {
