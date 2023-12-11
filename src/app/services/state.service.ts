@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { playerState } from '../interfaces/player-state';
 import { VideoSource } from '../interfaces/video-source';
@@ -17,5 +17,8 @@ export class StateService {
   playerState = signal<playerState>('stop');
   trackSources = signal<VideoSource[]>([]);
   selectedTrack = signal<VideoSource | undefined>(undefined);
+  totalTrackDuration = computed<number>(() => {
+    return this.trackSources().reduce((acc, value) => acc + value.duration, 0);
+  });
   constructor() {}
 }

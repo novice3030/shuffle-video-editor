@@ -25,6 +25,7 @@ import { FormsModule } from '@angular/forms';
 import { StateService } from '../../services/state.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { playerState } from '../../interfaces/player-state';
 const colors = [
   '#3498db',
   '#2ecc71',
@@ -63,21 +64,26 @@ export class VideoTrackComponent implements OnChanges {
   @Output() trackIndexChanged = new EventEmitter<number>();
   @Output() trackItemClicked = new EventEmitter<VideoSource>();
   @Input() position = 0;
+  @Input() totalDuration = 0;
   @Input() scale = 10;
   @Input() sources: VideoSource[] = [];
   @Input() selectedTrack: VideoSource | undefined;
+  @Input() playerState!: playerState;
   @Output() positionChanged = new EventEmitter<number>();
   @Output() deleteTrackClicked = new EventEmitter<number>();
   constructor(private state: StateService) {}
   markers: Marker[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    if (this.cursor) {
+    if (changes['position'] && this.playerState === 'play') {
       this.cursor.nativeElement.scrollIntoView({
         block: 'center',
         inline: 'center',
         behavior: 'auto',
       });
+    }
+    if (changes['totalDuration']) {
+      this.initMarkers();
     }
   }
 
@@ -163,7 +169,6 @@ export class VideoTrackComponent implements OnChanges {
 
   onDeleteTrackClicked(trackIndex: number) {
     this.deleteTrackClicked.emit(trackIndex);
-    this.initMarkers();
   }
 
   onTrackItemClicked(event: VideoSource) {
@@ -172,7 +177,7 @@ export class VideoTrackComponent implements OnChanges {
 
   private initMarkers() {
     this.markers = [];
-    const totalDuration = this.getTotalDuration();
+    const totalDuration = this.totalDuration;
     const totalTrackWidth = totalDuration * this.scale;
     const maxMarkers = Math.floor(totalTrackWidth / markerWidth);
     for (let i = 0; i <= maxMarkers; i++) {
@@ -186,9 +191,5 @@ export class VideoTrackComponent implements OnChanges {
         width: 0,
       });
     }
-  }
-
-  private getTotalDuration(): number {
-    return this.sources.reduce((total, video) => total + video.duration, 0);
   }
 }

@@ -7,7 +7,10 @@
       (pause)="onListPausePreviewClicked($event)"
     ></source-list>
     @if(selectedTrack()) {
-    <track-settings [track]="selectedTrack()!" (trackChanged)="onTrackSettingsChanged($event)"></track-settings>
+    <track-settings
+      [track]="selectedTrack()!"
+      (trackChanged)="onTrackSettingsChanged($event)"
+    ></track-settings>
     }
   </div>
   <div right>
@@ -31,6 +34,8 @@
       [selectedTrack]="selectedTrack()"
       (positionChanged)="onUserPositionChanged($event)"
       [position]="trackPosition()"
+      [totalDuration]="totalTrackDuration()"
+      [playerState]="playerState()"
       (trackIndexChanged)="onTrackIndexChanged($event)"
       (trackItemsChanged)="onTrackItemsChanged($event)"
       (deleteTrackClicked)="onDeleteTrackClicked($event)"

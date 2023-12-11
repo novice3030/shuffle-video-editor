@@ -44,6 +44,7 @@ export class AppComponent {
   selectedTrack = this.state.selectedTrack;
   sourceToPlay?: VideoSource;
   trackSources = this.state.trackSources;
+  totalTrackDuration = this.state.totalTrackDuration;
   videoSources: VideoSource[] = [
     {
       name: 'video 1',
@@ -121,9 +122,18 @@ export class AppComponent {
   }
 
   onDeleteTrackClicked(trackIndex: number) {
+    if (
+      trackIndex ===
+      this.trackSources().findIndex((track) => track === this.selectedTrack())
+    ) {
+      this.selectedTrack.set(undefined);
+    }
     this.trackSources.set(
       this.trackSources().filter((source, index) => index !== trackIndex)
     );
+    if (this.trackPosition() > this.totalTrackDuration()) {
+      this.trackPosition.set(0);
+    }
   }
 
   onTrackItemClicked(event: VideoSource) {

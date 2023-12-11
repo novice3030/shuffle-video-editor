@@ -2,6 +2,7 @@
 <div class="row middle-sm no-margin">
   <div>Scale &nbsp;</div>
   <mat-slider
+    matTooltipPosition="above"
     matTooltip="Slide to adjust the timeline scale"
     [disabled]="sources.length === 0"
     min="10"
@@ -30,10 +31,12 @@
     </div>
     }
   </div>
-  @if(sources.length > 0) {
+  @if(sources.length) {
   <div class="cursor" [style.left]="position * this.scale + 'px'" #cursor></div>
   } @else {
-  <h3 style="margin-left: 1em">Drag some sources to this container to get started</h3>
+  <p style="margin-left: 1em">
+    Drag some sources to this container to get started
+  </p>
   }
   <div class="source-list">
     @for (source of sources; track source; let i = $index) {
